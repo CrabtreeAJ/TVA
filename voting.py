@@ -12,16 +12,16 @@ def vote(scheme, situation):
 
     situation = numpy.array(situation)
 
-    if scheme.count(1)==1 & scheme.count(2)==0:
+    if scheme.count(1)==1 & scheme.count(2)==0: # Plurality voting
         unique, count = numpy.unique(situation[:,0], return_counts=True)
         winner = sorted(dict(zip(unique, count)).items(), key=lambda x: (x[1], 27-Alphabet.index(x[0])), reverse=True)[0][0]
-    elif scheme.count(1)==2:
+    elif scheme.count(1)==2: # Voting for two
         unique, count = numpy.unique(situation[:,[0,1]], return_counts=True)
         winner = sorted(dict(zip(unique, count)).items(), key=lambda x: (x[1], 27-Alphabet.index(x[0])), reverse=True)[0][0]
-    elif scheme.count(1)>1 & scheme.count(0)==1:
+    elif scheme.count(1)>1 & scheme.count(0)==1: # Anti-plurality voting
         unique, count = numpy.unique(situation[:,:-1], return_counts=True)
         winner = sorted(dict(zip(unique, count)).items(), key=lambda x: (x[1], 27-Alphabet.index(x[0])), reverse=True)[0][0]
-    elif scheme.count(2)>0:
+    elif scheme.count(2)>0: # Burda voting
         dictionary={}
         for x in scheme:
             unique, count = numpy.unique(situation[:,[scheme.index(x)]], return_counts=True)
