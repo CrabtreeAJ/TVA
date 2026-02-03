@@ -22,3 +22,11 @@ class basic_happiness(happiness):
             ind = column.index(win)
             hap.append(len(column) - len(column)/2 -ind)
         return hap
+    
+    def get_happiness_single(self, col, win):
+
+        col = list(col)
+        
+        ind = col.index(win)
+        hap = (len(col) - len(col)/2 -ind)
+        return hap
