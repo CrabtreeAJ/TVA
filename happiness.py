@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
 
+"""
+   Calculates happiness. Part of the output in testing.py (main). 
+"""
+
 class happiness(ABC):
     @abstractmethod
     def get_happiness(self):

@@ -2,6 +2,14 @@ from happiness import BasicHappiness
 from voting import VotingSystem
 import numpy as np
 
+""" 
+    File with main function of the project.
+    In this file, decide which experiment to run:
+    Combining a TVA and a voting scheme.
+    E.g. ATVA1 with Plurality voting.
+    Also define the output in this file (right now print).
+"""
+
 def main():
     schema = [3, 2, 1, 0]
     true_preferences = [["A", "C", "B", "D"], ["B", "D", "A", "C"], ["B", "A", "D", "C"], ["C", "A", "D", "B"],
