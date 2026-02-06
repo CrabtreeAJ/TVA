@@ -13,12 +13,13 @@ class VotingSystem:
         self.true_preferences = true_preferences
         self.scheme_vector = scheme
         self.scheme_name = self.determine_scheme(scheme)
-        self.result_list = []
+        self.true_result_list = []
+        self.last_result_list = []
 
     def true_vote(self):
-        self.result_list = self.vote(self.true_preferences)
+        self.true_result_list = self.vote(self.true_preferences)
 
-        return self.result_list
+        return self.true_result_list
 
 
     def vote(self, situation):
@@ -44,6 +45,8 @@ class VotingSystem:
                     temp_dict = dict(zip(unique, count * x))
                     dictionary = Counter(dictionary) + Counter(temp_dict)
                 winner = sorted(dictionary.items(), key=lambda x: (x[1], 27 - Alphabet.index(x[0])), reverse=True)
+
+        self.last_result_list = winner
 
         return winner
 

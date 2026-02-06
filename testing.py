@@ -1,4 +1,5 @@
 from happiness import BasicHappiness
+from strategic_voting import compromise, strat_voting_all
 from voting import VotingSystem
 import numpy as np
 
@@ -9,16 +10,22 @@ def main():
 
     VS = VotingSystem(np.array(true_preferences), schema)
 
-    winner = VS.true_vote()[0][0]
-    print(winner)
+    situation = VS.true_vote()
+    print("true voting:", situation)
 
-    hap = BasicHappiness(winner, true_preferences)
+    hap = BasicHappiness(situation[0][0], true_preferences)
 
     hap_metric = hap.get_happiness()
 
-    print(hap_metric)
+    print("happiness for true voting:", hap_metric)
 
     print("-----strategic voting testing-----")
+    strategic_vote, max_happiness, new_situation = compromise(VS, 1)
+    print("strategic vote result(compromise):", strategic_vote, max_happiness, new_situation)
+
+    print("situation with strategic voting:", VS.vote(new_situation))
+
+
 
     # strat_voting_all(schema, true_preferences, hap, hap_metric)
 

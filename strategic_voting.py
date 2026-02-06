@@ -7,11 +7,13 @@ from happiness import BasicHappiness
 def compromise(voting_system: VotingSystem, voter_id: int):
     voter_preference = voting_system.true_preferences[voter_id]
     best_strategy = voter_preference # initial best strategy is the true one
-    result_list = voting_system.result_list
+    best_situation = voting_system.true_preferences # initial best situation is true voting
+    result_list = voting_system.true_result_list
+    candidates_len = voter_preference.size
 
     delta_vote_count = [candidate[1] - result_list[0][1] for candidate in result_list]
     happiness_engine = BasicHappiness(result_list[0][0], voting_system.true_preferences)
-    max_happiness = happiness_engine.get_happiness_single(voting_system.true_preferences, result_list[0][0])
+    max_happiness = happiness_engine.get_happiness_single(voting_system.true_preferences[voter_id], result_list[0][0])
 
 
     # if result_list[0][0] == voter_preference[0]:
@@ -26,25 +28,25 @@ def compromise(voting_system: VotingSystem, voter_id: int):
         case "anti_plurality":
             pass
         case "burda":
-            # In burda voter can increase points of a candidate by at most 1(if they move their top preference down,
-            # other preferences go one by 1)
+            # In burda voter can increase points of a candidate by |candidates| - 'candidate rank in true preference'
             for index, candidate in enumerate(result_list):
-                if delta_vote_count[index] >= -1:
-                    new_vote = voter_preference[1::]
-                    new_vote = new_vote.insert(index, voter_preference[0])
+                max_improvement = candidates_len - np.where(voter_preference == candidate[0])[0]
 
-                    new_situation = np.insert(np.delete(voting_system.true_preferences, index, axis=0), index, new_vote, axis=0)
+                if 0 < abs(delta_vote_count[index]) <= max_improvement:
+                    new_vote = [x for x in voter_preference if x != candidate[0]]
+                    new_vote.insert(0, candidate[0])
+                    new_vote = np.array(new_vote)
+
+                    new_situation = np.insert(np.delete(voting_system.true_preferences, voter_id, axis=0), voter_id, new_vote, axis=0)
                     vote_result = voting_system.vote(new_situation)[0][0]
                     happiness = happiness_engine.get_happiness_single(new_vote, vote_result)
 
                     if happiness > max_happiness:
                         max_happiness = happiness
                         best_strategy = new_vote
+                        best_situation = new_situation
 
-
-
-
-    return best_strategy, max_happiness
+    return best_strategy, max_happiness, best_situation
 
 
 def strat_voting_all(voting_system: VotingSystem, hap, happiness):
