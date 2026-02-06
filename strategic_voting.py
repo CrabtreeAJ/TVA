@@ -9,42 +9,43 @@ def compromise(voting_system: VotingSystem, voter_id: int):
     best_strategy = voter_preference # initial best strategy is the true one
     best_situation = voting_system.true_preferences # initial best situation is true voting
     result_list = voting_system.true_result_list
-    candidates_len = voter_preference.size
 
-    delta_vote_count = [candidate[1] - result_list[0][1] for candidate in result_list]
     happiness_engine = BasicHappiness(result_list[0][0], voting_system.true_preferences)
     max_happiness = happiness_engine.get_happiness_single(voting_system.true_preferences[voter_id], result_list[0][0])
 
+    # If the most preferred candidate is already winning - no need to strategy vote
+    if result_list[0][0] == voter_preference[0]:
+        return best_strategy, max_happiness, best_situation
 
-    # if result_list[0][0] == voter_preference[0]:
-    #     return voter_preference
+    # NOTE: There seems to be no reason to put compromised candidate NOT in the first place, so we only consider that
+    break_flag = False
+    for index, candidate in enumerate(result_list):
+        if voting_system.scheme_name == "anti_plurality":
+            # For anti-plurality voting we can only 'move up' the last candidate, it doesn't matter to which position we move it,
+            # as the second-to-last candidate becomes the last one in any case, so we only run the loop once.
+            new_vote = voter_preference[:len(voter_preference)-1]
+            new_vote = np.insert(new_vote, -1, voter_preference[-1], axis=0)
 
-    match voting_system.scheme_name:
-        case "plurality":
-            print("check")
-            pass
-        case "voting_for_two":
-            pass
-        case "anti_plurality":
-            pass
-        case "burda":
-            # In burda voter can increase points of a candidate by |candidates| - 'candidate rank in true preference'
-            for index, candidate in enumerate(result_list):
-                max_improvement = candidates_len - np.where(voter_preference == candidate[0])[0]
+            break_flag = True # set the flag to break the loop
+        else:
+            # Voter tries to put every candidate in the first place of it's voting list
+            new_vote = [x for x in voter_preference if x != candidate[0]]
+            new_vote.insert(0, candidate[0])
+            new_vote = np.array(new_vote)
 
-                if 0 < abs(delta_vote_count[index]) <= max_improvement:
-                    new_vote = [x for x in voter_preference if x != candidate[0]]
-                    new_vote.insert(0, candidate[0])
-                    new_vote = np.array(new_vote)
+        # Run test vote and evaluate how happy voter will be with this change
+        new_situation = np.insert(np.delete(voting_system.true_preferences, voter_id, axis=0), voter_id, new_vote, axis=0)
+        vote_result = voting_system.vote(new_situation)[0][0]
+        happiness = happiness_engine.get_happiness_single(voter_preference, vote_result)
 
-                    new_situation = np.insert(np.delete(voting_system.true_preferences, voter_id, axis=0), voter_id, new_vote, axis=0)
-                    vote_result = voting_system.vote(new_situation)[0][0]
-                    happiness = happiness_engine.get_happiness_single(new_vote, vote_result)
+        # If happiness improved - save as the current best one
+        if happiness > max_happiness:
+            max_happiness = happiness
+            best_strategy = new_vote
+            best_situation = new_situation
 
-                    if happiness > max_happiness:
-                        max_happiness = happiness
-                        best_strategy = new_vote
-                        best_situation = new_situation
+        if break_flag:
+            break
 
     return best_strategy, max_happiness, best_situation
 

@@ -4,9 +4,9 @@ from voting import VotingSystem
 import numpy as np
 
 def main():
-    schema = [3, 2, 1, 0]
-    true_preferences = [["A", "C", "B", "D"], ["B", "D", "A", "C"], ["B", "A", "D", "C"], ["C", "A", "D", "B"],
-                        ["D", "C", "B", "A"]]
+    schema = [1, 1, 1, 0]
+    true_preferences = [["A", "C", "B", "D"], ["B", "D", "A", "C"], ["B", "D", "A", "C"], ["C", "D", "B", "A"],
+                        ["D", "C", "A", "B"]]
 
     VS = VotingSystem(np.array(true_preferences), schema)
 
@@ -24,8 +24,6 @@ def main():
     print("strategic vote result(compromise):", strategic_vote, max_happiness, new_situation)
 
     print("situation with strategic voting:", VS.vote(new_situation))
-
-
 
     # strat_voting_all(schema, true_preferences, hap, hap_metric)
 
