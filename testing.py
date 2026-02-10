@@ -4,16 +4,16 @@ from voting import VotingSystem
 import numpy as np
 
 def main():
-    schema = [1, 1, 1, 0]
+    schema = [1, 1, 0, 0]
     true_preferences = [["A", "C", "B", "D"], ["B", "D", "A", "C"], ["B", "D", "A", "C"], ["C", "D", "B", "A"],
                         ["D", "C", "A", "B"]]
 
     VS = VotingSystem(np.array(true_preferences), schema)
 
-    situation = VS.true_vote()
-    print("true voting:", situation)
+    winners = VS.true_vote()
+    print("true voting:", winners)
 
-    hap = BasicHappiness(situation[0][0], true_preferences)
+    hap = BasicHappiness(winners[0][0], true_preferences)
 
     hap_metric = hap.get_happiness()
 
