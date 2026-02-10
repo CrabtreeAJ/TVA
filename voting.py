@@ -1,6 +1,9 @@
 import numpy as np
 from collections import Counter
 
+Alphabet = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
+            "V", "W", "X", "Y", "Z")
+
 class VotingSystem:
     def __init__(self, true_preferences: np.ndarray, scheme: list):
         self.true_preferences = true_preferences
