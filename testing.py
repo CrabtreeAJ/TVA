@@ -1,5 +1,6 @@
 from happiness import BasicHappiness
 from voting import VotingSystem
+from risk import BasicRisk
 import numpy as np
 
 def main():
@@ -17,6 +18,12 @@ def main():
     hap_metric = hap.get_happiness()
 
     print(hap_metric)
+
+    print("-----risk output-----")
+
+    risk = BasicRisk(winner, true_preferences, schema)
+
+    print(risk.get_risk())
 
     print("-----strategic voting testing-----")
 
