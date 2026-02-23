@@ -18,6 +18,7 @@ def main():
     hap_metric = hap.get_happiness()
 
     print("happiness for true voting:", hap_metric)
+    print("total happiness for true voting", sum(hap_metric))
 
     print("-----strategic voting testing-----")
     strategic_vote, max_happiness, new_situation = compromise(VS, 1)

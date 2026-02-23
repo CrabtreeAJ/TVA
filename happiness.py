@@ -23,6 +23,16 @@ class BasicHappiness(happiness):
             hap.append(len(column) - len(column)/2 -ind)
         return hap
     
+    def get_happines_total(self, win):
+        sit = self.situation
+        
+        hap=[]
+
+        for column in sit:
+            ind = column.index(win)
+            hap.append(len(column) - len(column)/2 -ind)
+        return hap
+    
     def get_happiness_single(self, col, win):
 
         col = list(col)
