@@ -1,5 +1,5 @@
 from happiness import BasicHappiness
-from strategic_voting import compromise, burying, bullet_voting, strat_voting_all
+from strategic_voting import CompromiseStrategy, BuryingStrategy, BulletStrategy, BestStrategy
 from voting import VotingSystem
 import numpy as np
 
@@ -21,23 +21,23 @@ def main():
     print("total happiness for true voting", sum(hap_metric))
 
     print("-----strategic voting testing-----")
-    strategic_vote, max_happiness, new_situation = compromise(VS, 0)
+    strategic_vote, max_happiness, new_situation = CompromiseStrategy().find_strategy(VS, 0)
     print("strategic vote result(compromise):", strategic_vote, "new happiness:", max_happiness, "\n", new_situation)
 
     print("situation with compromise voting:", VS.vote(new_situation))
 
-    strategic_vote, max_happiness, new_situation = burying(VS, 0)
+    strategic_vote, max_happiness, new_situation = BuryingStrategy().find_strategy(VS, 0)
     print("strategic vote result(burying):", strategic_vote, "new happiness:", max_happiness, "\n", new_situation)
 
     print("situation with burying voting:", VS.vote(new_situation))
 
-    strategic_vote, max_happiness, new_situation = bullet_voting(VS, 0)
+    strategic_vote, max_happiness, new_situation = BulletStrategy().find_strategy(VS, 0)
     print("strategic vote result(bullet):", strategic_vote, "new happiness:", max_happiness, "\n", new_situation)
 
     print("situation with bullet voting:", VS.vote(new_situation))
 
     print("Optimal strategic vote(independent from specific strategy types):\n")
-    strat_voting_all(VS, BasicHappiness, hap_metric)
+    BestStrategy().find_strategy(VS, 0)
 
 
 if __name__ == "__main__":

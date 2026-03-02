@@ -1,10 +1,21 @@
+import random
+from typing import override
 import numpy as np
 from collections import Counter
+from typing import TYPE_CHECKING
 
-Alphabet = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
-            "V", "W", "X", "Y", "Z")
+# !!! THIS IS ONLY FOR IDE TYPE CHECKING, IF IT CAUSES ANY ERRORS YOU CAN COMMENT IT OUT !!!
+# Directly importing from strategic_voting causes circular import issue, so have to apply this workaround
+if TYPE_CHECKING:
+    from strategic_voting import StrategicVote
+
 
 class VotingSystem:
+    """
+    System that simulates votings and stores results.
+
+    IMPORTANT: Run .true_vote() before any simulations, as .simulate() needs self.true_result_list to be filled
+    """
     def __init__(self, true_preferences: np.ndarray, candidates: list, scheme: list):
         self.true_preferences = true_preferences
         self.scheme_vector = scheme
@@ -13,14 +24,14 @@ class VotingSystem:
         self.last_result_list = []
         self.candidates = candidates
 
-
     def true_vote(self):
+        """Initiates voting with only true preferences. Additionally, updates true_result_list with vote results"""
         self.true_result_list = self.vote(self.true_preferences)
-
         return self.true_result_list
 
-
     def vote(self, situation):
+        """Calculates winners for the given situation according to the defined scheme"""
+
         winner = []
         self.last_result_list.clear()
 
@@ -52,6 +63,33 @@ class VotingSystem:
 
         return self.last_result_list
 
+    def simulate(self, strategy_type: "StrategicVote", cheating_probs: None|list[float] = None, to_print: bool = True):
+        """Simulates strategic voting. Apart from cheater's vote,
+         other votes are true preferences
+
+        Args:
+            strategy_type (StrategicVote): The specific strategy a cheating
+                voter will attempt to apply.
+
+            cheating_probs (list[float], optional): List of probabilities of cheating for every voter,
+             where cheater[voter_id] = prob. If None, a voter who attempts to cheat
+             will be selected uniformly at random.
+
+            to_print (bool, optional): Flag to define whether runtime prints are allowed or not
+        """
+
+        cheater_id = random.choices([i for i in range(len(self.true_preferences))], cheating_probs)
+
+        # situation where voter with `cheater_id` applied strategy of `strategy_type`
+        cheater_strategy, cheater_happiness, situation = strategy_type.find_strategy(self, cheater_id)
+
+        if self.true_preferences[cheater_id] != cheater_strategy:
+            print(f"Voter with {cheater_id} cheated! Theirs new strategy is {cheater_strategy}"
+                  f" and new individual happiness is {cheater_happiness}.")
+
+
+        return self.vote(situation)
+
 
     def determine_scheme(self, scheme_vector: list):
         if scheme_vector.count(1) == 1 and scheme_vector.count(2) == 0:  # Plurality voting
@@ -66,7 +104,24 @@ class VotingSystem:
         return ""
 
 
+class VotingSystemATVA4(VotingSystem):
+    @override
+    def simulate(self, strategy_type: "StrategicVote", cheating_probs: None|list[float] = None, to_print: bool = True):
+        situation = self.true_preferences
 
+        # Let every voter try to cheat
+        for cheater_id in range(len(self.true_preferences)):
+            # situation where voter with `cheater_id` applied strategy of `strategy_type`
+            cheater_strategy, cheater_happiness, _ = strategy_type.find_strategy(self, cheater_id)
+
+            # update situation with strategies that include cheating for every voter
+            situation = np.insert(np.delete(situation, cheater_id, axis=0), cheater_id, cheater_strategy, axis=0)
+
+            if self.true_preferences[cheater_id] != cheater_strategy:
+                print(f"Voter with {cheater_id} cheated! Theirs new strategy is {cheater_strategy}"
+                      f" and new individual happiness is {cheater_happiness}.")
+
+        return self.vote(situation)
 
 
 
