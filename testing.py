@@ -13,9 +13,9 @@ def main():
     winners = VS.true_vote()
     print("true voting:", winners)
 
-    hap = BasicHappiness(winners[0][0], true_preferences)
+    basic_happiness = BasicHappiness(winners[0][0], true_preferences)
 
-    hap_metric = hap.get_happiness()
+    hap_metric = basic_happiness.get_happiness()
 
     print("happiness for true voting:", hap_metric)
     print("total happiness for true voting", sum(hap_metric))
@@ -37,7 +37,7 @@ def main():
     print("situation with bullet voting:", VS.vote(new_situation))
 
     print("Optimal strategic vote(independent from specific strategy types):\n")
-    strat_voting_all(VS, hap, hap_metric)
+    strat_voting_all(VS, BasicHappiness, hap_metric)
 
 
 if __name__ == "__main__":

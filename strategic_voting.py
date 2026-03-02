@@ -154,7 +154,7 @@ def bullet_voting(voting_system: VotingSystem, voter_id: int):
 
 
 
-def strat_voting_all(voting_system: VotingSystem, hap, happiness):
+def strat_voting_all(voting_system: VotingSystem, basic_happiness, happiness):
     true_preferences = voting_system.true_preferences
 
     for x, column in enumerate(true_preferences):
@@ -164,7 +164,7 @@ def strat_voting_all(voting_system: VotingSystem, hap, happiness):
         for j in permutations(column):
             strat_vote_sit = np.insert(np.delete(true_preferences, x, axis=0), x, j, axis=0)
             strat_win = voting_system.vote(strat_vote_sit)[0][0]
-            strat_hap = hap.get_happiness_single(column, strat_win)
+            strat_hap = basic_happiness.get_happiness_single(column, strat_win)
 
             if strat_hap > best_hap:
                 best_hap = strat_hap
