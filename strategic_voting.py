@@ -83,14 +83,11 @@ class BuryingStrategy(StrategicVote):
             result_list = voting_system.true_result_list
 
             happiness_engine = BasicHappiness(result_list[0][0], voting_system.true_preferences)
-            print("BBBB", voting_system.true_preferences)
             max_happiness = happiness_engine.get_happiness_single(voting_system.true_preferences[voter_id], result_list[0][0])
         except IndexError:
             raise IndexError(
             f"voting_system.true_results_list field seems to be empty, run voting_system.true_vote() first."
             )
-
-        print(result_list, max_happiness, "ABABAB")
 
         # If the most preferred candidate is already winning - no need to strategy vote
         if result_list[0][0] == voter_preference[0]:
@@ -117,11 +114,10 @@ class BuryingStrategy(StrategicVote):
             for i, candidate in enumerate(voter_preference):
                 if voting_system.scheme_vector[i] == 0:
                     break
-                # Voter tries to put every candidate in the first place of it's voting list
-                new_vote = np.insert(np.delete(voter_preference, i), 0, candidate)
+                # Voter tries to put every candidate in the last place of it's voting list
+                new_vote = np.insert(np.delete(voter_preference, i), len(voter_preference)-1, candidate)
 
                 happiness, new_situation = test_new_vote(voting_system, happiness_engine, new_vote, voter_id)
-                print(happiness, new_situation, "AAAAAA")
 
                 # If happiness improved - save as the current best one
                 if happiness > max_happiness:
