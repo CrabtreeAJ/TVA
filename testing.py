@@ -1,6 +1,7 @@
 from happiness import BasicHappiness
 from strategic_voting import CompromiseStrategy, BuryingStrategy, BulletStrategy, BestStrategy
 from voting import VotingSystem
+from risk import BasicRisk
 import numpy as np
 
 def main():
@@ -20,6 +21,12 @@ def main():
 
     print("happiness for true voting:", hap_metric)
     print("total happiness for true voting", sum(hap_metric))
+
+    print("-----risk output-----")
+
+    risk = BasicRisk(winner, true_preferences, schema)
+
+    print(risk.get_risk())
 
     print("-----strategic voting testing-----")
     strategic_vote, max_happiness, new_situation = CompromiseStrategy().find_strategy(VS, 0)
