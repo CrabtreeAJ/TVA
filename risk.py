@@ -1,6 +1,12 @@
 import itertools
 from abc import ABC, abstractmethod
-from voting import Alphabet
+#from voting import Alphabet
+
+import string
+Alphabet = list(string.ascii_uppercase)
+
+
+
 
 
 #Risk: The number of voter who can benefit from voting strategically divided by total number of voters.
@@ -94,4 +100,24 @@ class BasicRisk(Risk):
             "can_benefit": can_benefit, 
         }
     
+    
+        
+
+    def get_risk_from_happiness(self, true_happiness, strategic_happiness):
+
+        voter_strategic_happiness = [sublist[i] for i, sublist in enumerate(strategic_happiness)]
+
+        n_voters = len(true_happiness)
+        can_benefit = [False] * n_voters
+
+        for x in range(len(true_happiness)):
+
+            if voter_strategic_happiness[x] > true_happiness[x]:
+                can_benefit[x] = True
+
+        risk_value = sum(can_benefit) / n_voters
+
+        return risk_value
+        
+
  

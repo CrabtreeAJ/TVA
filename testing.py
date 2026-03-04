@@ -24,9 +24,9 @@ def main():
 
     print("-----risk output-----")
 
-    risk = BasicRisk(winner, true_preferences, schema)
+    #risk = BasicRisk(winner, true_preferences, schema)
 
-    print(risk.get_risk())
+    #print(risk.get_risk())
 
     print("-----strategic voting testing-----")
     strategic_vote, max_happiness, new_situation = CompromiseStrategy().find_strategy(VS, 0)
