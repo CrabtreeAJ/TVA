@@ -2,7 +2,7 @@ from itertools import permutations
 import numpy as np
 from voting import VotingSystem
 from happiness import BasicHappiness
-from strategic_voting import compromise, burying, bullet_voting
+from strategic_voting import CompromiseStrategy, BuryingStrategy, BulletStrategy, BestStrategy
 
 def ATVA4_strat_voting_all(voting_system: VotingSystem, basic_happiness, happiness):
 
@@ -52,7 +52,7 @@ def ATVA4_compromise(voting_system: VotingSystem, voter_id: int, happiness, basi
     for x, column in enumerate(true_preferences):
         best_strategy = None
 
-        best_strategy, max_happiness, _ = compromise(VotingSystem, x)
+        best_strategy, max_happiness, _ = CompromiseStrategy().find_strategy(voting_system, x)
         
 
         voter_strats.append((x,best_strategy))
@@ -83,7 +83,7 @@ def ATVA4_burying(voting_system: VotingSystem, voter_id: int, happiness, basic_h
     for x, column in enumerate(true_preferences):
         best_strategy = None
 
-        best_strategy, max_happiness, _ = burying(VotingSystem, x)
+        best_strategy, max_happiness, _ = BuryingStrategy().find_strategy(voting_system, x)
         
 
         voter_strats.append((x,best_strategy))
@@ -115,7 +115,7 @@ def ATVA4_bullet_voting(voting_system: VotingSystem, voter_id: int, happiness, b
     for x, column in enumerate(true_preferences):
         best_strategy = None
 
-        best_strategy, max_happiness, _ = bullet_voting(VotingSystem, x)
+        best_strategy, max_happiness, _ = BulletStrategy().find_strategy(voting_system, x)
         
 
         voter_strats.append((x,best_strategy))

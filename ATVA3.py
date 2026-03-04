@@ -22,7 +22,7 @@ def expected_happiness(voting_system, voter_id, ballot, known_voters, samples):
     for _ in range(samples):
         simulated_situation = []
         for j in range(n):
-            if j == voter_id: #Voter taht i sbeing evaluated
+            if j == voter_id: #Voter that is being evaluated
                 simulated_situation.append(ballot)
             elif j in known_voters: #Voters of which tva3 has true knowledge
                 simulated_situation.append(true_preferences[j])

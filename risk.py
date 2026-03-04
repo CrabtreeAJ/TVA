@@ -1,6 +1,5 @@
 import itertools
 from abc import ABC, abstractmethod
-from voting import Alphabet
 
 
 #Risk: The number of voter who can benefit from voting strategically divided by total number of voters.
@@ -47,7 +46,7 @@ class BasicRisk(Risk):
         max_score = max(totals.values())
         winners = [candidate for candidate, score in totals.items() if score == max_score]
         # Return the alphabetically first candidate in case of a tie (As in the document "Strategic_voting_description" -> "V. Additional remarks")
-        winners.sort(key=lambda candidate: Alphabet.index(candidate))
+        winners.sort(key=lambda x: ord('A') - ord(x), reverse=True)
         return winners[0] # Initially used: return sorted(winners)[0]
           
     def get_risk(self):
