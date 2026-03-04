@@ -2,6 +2,7 @@ from happiness import BasicHappiness
 from strategic_voting import CompromiseStrategy, BuryingStrategy, BulletStrategy, BestStrategy
 from voting import VotingSystem
 from risk import BasicRisk
+from ATVA3 import imperfect_knowledge
 import numpy as np
 
 def main():
@@ -24,9 +25,9 @@ def main():
 
     print("-----risk output-----")
 
-    #risk = BasicRisk(winner, true_preferences, schema)
+    risk = BasicRisk(winners, true_preferences, schema)
 
-    #print(risk.get_risk())
+    print("Potential risk:", risk.get_risk())
 
     print("-----strategic voting testing-----")
     strategic_vote, max_happiness, new_situation = CompromiseStrategy().find_strategy(VS, 0)
@@ -47,7 +48,12 @@ def main():
     print("Optimal strategic vote(independent from specific strategy types):\n")
     strategic_vote, max_happiness, new_situation = BestStrategy().find_strategy(VS, 0)
     print("strategic vote result(any):", strategic_vote, "new happiness:", max_happiness, "\n", new_situation)
-    print("Results with bullet voting:", VS.vote(new_situation))
+    print("Results the best strategy:", VS.vote(new_situation))
+
+
+    print("-----ATVA testing-----")
+    imperfect_knowledge(VS)
+
 
 
 

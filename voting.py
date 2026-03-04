@@ -42,6 +42,10 @@ class VotingSystem:
     @property
     def true_result_list(self):
         """Returns the initial result list."""
+
+        if len(self._true_result_list) == 0:
+            raise ValueError("No true results found. Run .true_vote() first")
+
         return self._true_result_list.copy()
 
     @property
