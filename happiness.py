@@ -20,7 +20,8 @@ class BasicHappiness(happiness):
 
         for column in sit:
             ind = column.index(win)
-            hap.append(len(column) - len(column)/2 -ind)
+            hap.append(round(1-ind/(len(column)-1),2))
+            #hap.append(len(column) - len(column)/2 -ind)
         return hap
     
     def get_happines_total(self, win):
@@ -30,7 +31,8 @@ class BasicHappiness(happiness):
 
         for column in sit:
             ind = column.index(win)
-            hap.append(len(column) - len(column)/2 -ind)
+            hap.append(round(1-ind/(len(column)-1),2))
+            #hap.append(len(column) - len(column)/2 -ind)
         return hap
     
     def get_happiness_single(self, col, win):
@@ -38,5 +40,6 @@ class BasicHappiness(happiness):
         col = list(col)
         
         ind = col.index(win)
-        hap = (len(col) - len(col)/2 -ind)
+        hap = (round(1-ind/(len(col)-1),2))
+        #hap = (len(col) - len(col)/2 -ind)
         return hap

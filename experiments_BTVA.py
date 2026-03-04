@@ -135,4 +135,4 @@ if __name__ == "__main__":
     bullet = "bullet"
     best = "best"
     
-    main(3, borda, compromise)
+    main(1, borda, compromise)
