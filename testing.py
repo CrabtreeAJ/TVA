@@ -50,9 +50,11 @@ def main():
     print("strategic vote result(any):", strategic_vote, "new happiness:", max_happiness, "\n", new_situation)
     print("Results the best strategy:", VS.vote(new_situation))
 
-
     print("-----ATVA testing-----")
-    imperfect_knowledge(VS)
+    imperfect_knowledge(VS, CompromiseStrategy())
+    #imperfect_knowledge(VS, BuryingStrategy())
+    #imperfect_knowledge(VS, BulletStrategy())
+    #imperfect_knowledge(VS, BestStrategy())
 
 
 

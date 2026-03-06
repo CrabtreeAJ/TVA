@@ -1,5 +1,5 @@
 import random
-from typing_extensions import override
+from typing import override
 import numpy as np
 from collections import Counter
 from typing import TYPE_CHECKING

@@ -3,6 +3,7 @@ import numpy as np
 from itertools import permutations
 from voting import VotingSystem
 from happiness import BasicHappiness
+from strategic_voting import StrategicVote
 
 
 """
@@ -40,7 +41,7 @@ def expected_happiness(voting_system, voter_id, ballot, known_voters, samples):
     return total / samples #Average over all simulations
 
 #TVA3 knows 50% of the other pvoters preferences and runs 50 simulations.
-def imperfect_knowledge(voting_system, samples = 50, knowledge_percentage = 0.5):
+def imperfect_knowledge(voting_system, strategy: StrategicVote, samples = 50, knowledge_percentage = 0.5):
     true_preferences = voting_system.true_preferences
     n = len(true_preferences)
     for voter_id, column in enumerate(true_preferences): #Iterate over all voters.
@@ -55,14 +56,19 @@ def imperfect_knowledge(voting_system, samples = 50, knowledge_percentage = 0.5)
         best_strategy = None 
         best_expected = expected_honest_happiness 
 
-        #Test all possible ballots
-        for perm in permutations(column):
-            #Evaluate each strategy
-            exp_hap = expected_happiness(voting_system, voter_id, perm, known_voters, samples)
+        strategy_ballot, _, _ = strategy.find_strategy(voting_system, voter_id)
+        possible_ballots = [column]
+        if not np.array_equal(strategy_ballot, column):
+                possible_ballots.append(strategy_ballot)
+            
+        for ballot in possible_ballots:
+            exp_hap = expected_happiness(voting_system, voter_id, ballot, known_voters, samples)
+        
+
 
             if exp_hap > best_expected:
                 best_expected = exp_hap
-                best_strategy = perm    
+                best_strategy = ballot 
         if best_strategy is not None:
             print(f"Voter {voter_id} can increase happiness.")
             print(f"Best strategy: {best_strategy}")
