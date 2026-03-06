@@ -1,5 +1,6 @@
 from happiness import BasicHappiness
 from strategic_voting import CompromiseStrategy, BuryingStrategy, BulletStrategy, BestStrategy
+from ATVA4 import ATVA4_compromise, ATVA4_burying, ATVA4_bullet_voting, ATVA4_strat_voting_all
 from voting import VotingSystem
 from risk import BasicRisk
 import numpy as np
@@ -9,7 +10,7 @@ import csv
 
 
 
-def main(schema_type: str, strategy: str, iterations: int):
+def main(schema_type: str, strategy: str, TVA: str, iterations: int):
 
     
     risk_list = []
@@ -44,44 +45,55 @@ def main(schema_type: str, strategy: str, iterations: int):
 
                 strategic_happiness_compiled = [0] * len(happiness_metric)
 
-                for y in range(num_voters):
-
+                if TVA == "ATVA4":
                     if strategy == "compromise":
-                        strategic_vote, max_happiness, new_situation = CompromiseStrategy().find_strategy(VS, y)
-                        #print("-----Compromise voter ", y, "-----")
-                        winner = VS.vote(new_situation)[0][0]
-                        strategic_happiness_system = BasicHappiness(winner, true_preferences)
-                        strategic_happiness_metric = strategic_happiness_system.get_happiness()
-                        strategic_happiness_compiled[y] = strategic_happiness_metric
-                        #print("(", strategic_vote, winner, strategic_happiness_metric[y], happiness_metric[y], sum(strategic_happiness_metric), sum(happiness_metric), ")")
-                        #print("---")
-
+                        new_situation = ATVA4_compromise(VS)
                     elif strategy == "bury":
-                        strategic_vote, max_happiness, new_situation = BuryingStrategy().find_strategy(VS, y)
-                        #print("-----Bury voter ", y, "-----")
-                        winner = VS.vote(new_situation)[0][0]
-                        strategic_happiness_system = BasicHappiness(winner, true_preferences)
-                        strategic_happiness_metric = strategic_happiness_system.get_happiness()
-                        strategic_happiness_compiled[y] = strategic_happiness_metric
-                        #print("(", strategic_vote, winner, strategic_happiness_metric[y], happiness_metric[y], sum(strategic_happiness_metric), sum(happiness_metric), ")")
-                        #print("---")
-
+                        new_situation = ATVA4_burying(VS)
                     elif strategy == "bullet":
-                        strategic_vote, max_happiness, new_situation = BulletStrategy().find_strategy(VS, y)
-                        #print("-----Bullet voter ", y, "-----")
+                        new_situation = ATVA4_bullet_voting(VS)
+                
+                    winner = VS.vote(new_situation)[0][0]
+                    strategic_happiness_system = BasicHappiness(winner, true_preferences)
+                    strategic_happiness_metric = strategic_happiness_system.get_happiness()
+                    strategic_happiness_compiled = np.diag(strategic_happiness_metric)
+
+                else:
+
+                    for y in range(num_voters):
+
+                        new_situation=""
+
+                        if strategy == "compromise":
+                            if TVA == "BTVA":
+                                strategic_vote, max_happiness, new_situation = CompromiseStrategy().find_strategy(VS, y)
+                            #print("-----Compromise voter ", y, "-----")
+                            #print("(", strategic_vote, winner, strategic_happiness_metric[y], happiness_metric[y], sum(strategic_happiness_metric), sum(happiness_metric), ")")
+                            #print("---")
+
+                        elif strategy == "bury":
+                            strategic_vote, max_happiness, new_situation = BuryingStrategy().find_strategy(VS, y)
+                            #print("-----Bury voter ", y, "-----")
+                            #print("(", strategic_vote, winner, strategic_happiness_metric[y], happiness_metric[y], sum(strategic_happiness_metric), sum(happiness_metric), ")")
+                            #print("---")
+
+                        elif strategy == "bullet":
+                            strategic_vote, max_happiness, new_situation = BulletStrategy().find_strategy(VS, y)
+                            #print("-----Bullet voter ", y, "-----")
+                            #print("(", strategic_vote, winner, strategic_happiness_metric[y], happiness_metric[y], sum(strategic_happiness_metric), sum(happiness_metric), ")")
+                            #print("---")
+
+                        elif strategy == "best":
+                            #print("Optimal strategic vote (independent from specific strategy types):\n")
+                            strategic_vote, max_happiness, new_situation = BestStrategy().find_strategy(VS, y)
+                            #print("strategic vote result(any):", strategic_vote, "new happiness:", max_happiness, "\n", new_situation)
+                            #print("Results with bullet voting:", VS.vote(new_situation))
+
+
                         winner = VS.vote(new_situation)[0][0]
                         strategic_happiness_system = BasicHappiness(winner, true_preferences)
                         strategic_happiness_metric = strategic_happiness_system.get_happiness()
                         strategic_happiness_compiled[y] = strategic_happiness_metric
-                        #print("(", strategic_vote, winner, strategic_happiness_metric[y], happiness_metric[y], sum(strategic_happiness_metric), sum(happiness_metric), ")")
-                        #print("---")
-
-                    elif strategy == "best":
-                        #print("Optimal strategic vote (independent from specific strategy types):\n")
-                        strategic_vote, max_happiness, new_situation = BestStrategy().find_strategy(VS, y)
-                        strategic_happiness_compiled[y] = strategic_happiness_metric
-                        #print("strategic vote result(any):", strategic_vote, "new happiness:", max_happiness, "\n", new_situation)
-                        #print("Results with bullet voting:", VS.vote(new_situation))
 
                 #print("-----risk output-----")
 
@@ -99,7 +111,7 @@ def main(schema_type: str, strategy: str, iterations: int):
             })            
             print(num_candidates, num_voters)
 
-    save_results(risk_list, schema, strategy, f"BTVA_{schema_type}_{strategy}")
+    save_results(risk_list, schema, strategy, f"{TVA}_{schema_type}_{strategy}")
     #print("risk_list", risk_list)    
 
 
@@ -156,5 +168,8 @@ if __name__ == "__main__":
     bury = "bury"
     bullet = "bullet"
     best = "best"
+
+    BTVA = "BTVA"
+    ATVA4 = "ATVA4"
     
-    main(borda, compromise, 50)
+    main(anti_plurality, bury, BTVA, 50)
