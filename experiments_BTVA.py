@@ -2,6 +2,7 @@ from happiness import BasicHappiness
 from strategic_voting import CompromiseStrategy, BuryingStrategy, BulletStrategy, BestStrategy
 from ATVA4 import ATVA4_compromise, ATVA4_burying, ATVA4_bullet_voting, ATVA4_strat_voting_all
 from ATVA3 import ATVA3_imperfect_knowledge
+from ATVA2 import atva2_sit
 from voting import VotingSystem
 from risk import BasicRisk
 import numpy as np
@@ -68,6 +69,8 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
                         if strategy == "compromise":
                             if TVA == "BTVA":
                                 _, _, new_situation = CompromiseStrategy().find_strategy(VS, y)
+                            elif TVA == "ATVA2":
+                                new_situation = atva2_sit(VS, CompromiseStrategy(), y)
                             elif TVA == "ATVA3":
                                 new_situation = ATVA3_imperfect_knowledge(VS, CompromiseStrategy(), y)
                             #print("-----Compromise voter ", y, "-----")
@@ -77,6 +80,8 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
                         elif strategy == "bury":
                             if TVA == "BTVA":
                                 _, _, new_situation = BuryingStrategy().find_strategy(VS, y)
+                            elif TVA == "ATVA2":
+                                new_situation = atva2_sit(VS, BuryingStrategy(), y)
                             elif TVA == "ATVA3":
                                 new_situation = ATVA3_imperfect_knowledge(VS, BuryingStrategy(), y)
                             #print("-----Bury voter ", y, "-----")
@@ -86,6 +91,8 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
                         elif strategy == "bullet":
                             if TVA == "BTVA":
                                 _, _, new_situation = BulletStrategy().find_strategy(VS, y)
+                            elif TVA == "ATVA2":
+                                new_situation = atva2_sit(VS, BulletStrategy(), y)
                             elif TVA == "ATVA3":
                                 new_situation = ATVA3_imperfect_knowledge(VS, BulletStrategy(), y)
                             #print("-----Bullet voter ", y, "-----")
@@ -179,8 +186,10 @@ if __name__ == "__main__":
     best = "best"
 
     BTVA = "BTVA"
+    ATVA1 = "ATVA1"
+    ATVA2 = "ATVA2"
     ATVA3 = "ATVA3"
     ATVA4 = "ATVA4"
 
     
-    main(plurality, bullet, ATVA3, 50)
+    main(borda, compromise, ATVA2, 50)

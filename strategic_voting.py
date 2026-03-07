@@ -11,6 +11,8 @@ class StrategicVote(ABC):
     @abstractmethod
     def find_strategy(self, voting_system: VotingSystem, voter_id: int) -> Tuple[np.ndarray, int, np.ndarray]:
         pass
+    def find_all_strategies(self, voting_system: VotingSystem, voter_id: int) -> np.ndarray:
+        pass
 
 
 
@@ -71,10 +73,35 @@ class CompromiseStrategy(StrategicVote):
                     best_situation = new_situation
 
         return best_strategy, max_happiness, best_situation
+    
+    def find_all_strategies(self, voting_system: VotingSystem, voter_id: int):
+        try:
+            voter_preference = voting_system.true_preferences[voter_id]
+            result_list = voting_system.true_result_list
+        except IndexError:
+            raise IndexError(
+                f"voting_system.true_results_list field seems to be empty, run voting_system.true_vote() first."
+            )
+
+        strategies = []
+
+        if voting_system.scheme_name == "borda":
+            for old_index, candidate in enumerate(voter_preference):
+                for new_index in range(old_index):
+                    new_vote = np.insert(np.delete(voter_preference, old_index), new_index, candidate)
+                    strategies.append(new_vote)
+        else:
+            for i, candidate in enumerate(voter_preference):
+                if voting_system.scheme_vector[i] == 1:
+                    continue
+                new_vote = np.insert(np.delete(voter_preference, i), 0, candidate)
+                strategies.append(new_vote)
+
+        return strategies
 
 
 class BuryingStrategy(StrategicVote):
-    """Finds the best possible strategy by applying compromise"""
+    """Finds the best possible strategy by applying burying"""
     def find_strategy(self, voting_system: VotingSystem, voter_id: int):
         try:
             voter_preference = voting_system.true_preferences[voter_id]
@@ -127,6 +154,31 @@ class BuryingStrategy(StrategicVote):
 
 
         return best_strategy, max_happiness, best_situation
+    
+    def find_all_strategies(self, voting_system: VotingSystem, voter_id: int):
+        try:
+            voter_preference = voting_system.true_preferences[voter_id]
+            result_list = voting_system.true_result_list
+        except IndexError:
+            raise IndexError(
+                f"voting_system.true_results_list field seems to be empty, run voting_system.true_vote() first."
+            )
+
+        strategies = []
+
+        if voting_system.scheme_name == "borda":
+            for old_index, candidate in enumerate(voter_preference):
+                for new_index in range(old_index, voter_preference.size):
+                    new_vote = np.insert(np.delete(voter_preference, old_index), new_index, candidate)
+                    strategies.append(new_vote)
+        else:
+            for i, candidate in enumerate(voter_preference):
+                if voting_system.scheme_vector[i] == 0:
+                    break
+                new_vote = np.insert(np.delete(voter_preference, i), len(voter_preference)-1, candidate)
+                strategies.append(new_vote)
+
+        return strategies
 
 class BulletStrategy(StrategicVote):
     """
@@ -181,6 +233,36 @@ class BulletStrategy(StrategicVote):
                 best_situation = new_situation
 
         return best_strategy, max_happiness, best_situation
+
+    def find_all_strategies(self, voting_system: VotingSystem, voter_id: int):
+        try:
+            voter_preference = voting_system.true_preferences[voter_id]
+            result_list = voting_system.true_result_list
+        except IndexError:
+            raise IndexError(
+                f"voting_system.true_results_list field seems to be empty, run voting_system.true_vote() first."
+            )
+
+        strategies = []
+
+        if voting_system.scheme_name == "plurality":
+            return strategies
+
+        for i in range(len(voter_preference)):
+            if voting_system.scheme_name == "borda" and i > 0:
+                break
+
+            if voting_system.scheme_vector[i] == 0:
+                break
+
+            new_vote = np.array(voter_preference, dtype=np.str_)
+            for j in range(len(voter_preference)):
+                if i == j: continue
+                new_vote[j] = "-"
+
+            strategies.append(new_vote)
+
+        return strategies
 
 
 class BestStrategy(StrategicVote):
