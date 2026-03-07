@@ -41,37 +41,26 @@ def expected_happiness(voting_system, voter_id, ballot, known_voters, samples):
     return total / samples #Average over all simulations
 
 #TVA3 knows 50% of the other pvoters preferences and runs 50 simulations.
-def imperfect_knowledge(voting_system, strategy: StrategicVote, samples = 50, knowledge_percentage = 0.5):
+def ATVA3_imperfect_knowledge(voting_system, strategy: StrategicVote, voter_id, samples=50, knowledge_percentage=0.5):
     true_preferences = voting_system.true_preferences
     n = len(true_preferences)
-    for voter_id, column in enumerate(true_preferences): #Iterate over all voters.
-    
-        #Pick the voters of which tva3 has true knowledge
-        other_voters = [i for i in range(n) if i != voter_id] 
-        k = int(len(other_voters) * knowledge_percentage) #int rounds down. So 4.5 -> 4
-        known_voters = set(random.sample(other_voters, k))
 
-        #Compute happiness for the honest expected happines
-        expected_honest_happiness = expected_happiness(voting_system, voter_id, column, known_voters, samples)
-        best_strategy = None 
-        best_expected = expected_honest_happiness 
+    other_voters = [i for i in range(n) if i != voter_id]
+    k = int(len(other_voters) * knowledge_percentage)
+    known_voters = set(random.sample(other_voters, k))
 
-        strategy_ballot, _, _ = strategy.find_strategy(voting_system, voter_id)
-        possible_ballots = [column]
-        if not np.array_equal(strategy_ballot, column):
-                possible_ballots.append(strategy_ballot)
-            
-        for ballot in possible_ballots:
-            exp_hap = expected_happiness(voting_system, voter_id, ballot, known_voters, samples)
-        
+    column = true_preferences[voter_id]
+    expected_honest_happiness = expected_happiness(voting_system, voter_id, column, known_voters, samples)
 
+    best_ballot = column
+    best_expected = expected_honest_happiness
 
-            if exp_hap > best_expected:
-                best_expected = exp_hap
-                best_strategy = ballot 
-        if best_strategy is not None:
-            print(f"Voter {voter_id} can increase happiness.")
-            print(f"Best strategy: {best_strategy}")
-            print(f"Expected improvement: {best_expected - expected_honest_happiness}\n")
+    strategy_ballot, _, _ = strategy.find_strategy(voting_system, voter_id)
+    if not np.array_equal(strategy_ballot, column):
+        exp_hap = expected_happiness(voting_system, voter_id, strategy_ballot, known_voters, samples)
+        if exp_hap > best_expected:
+            best_ballot = strategy_ballot
 
-    return 0
+    new_situation = list(true_preferences.copy())
+    new_situation[voter_id] = best_ballot
+    return np.array(new_situation)
