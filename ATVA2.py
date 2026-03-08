@@ -10,7 +10,7 @@ E.g. If voter i changes their ballot to improve the outcome, the other voters ma
 ATVA-2 therefore evaluates manipulation while taking into account possible best responses from the other voters.
 """
 
-def apply_counter_responses(voting_system, profile, excluding_voter):
+def apply_counter_responses(voting_system, profile, excluding_voter, strategy: StrategicVote):
     """
     Apply one round of best responses
     for all voters except excluding_voter.
@@ -19,12 +19,12 @@ def apply_counter_responses(voting_system, profile, excluding_voter):
 
     for j in range(n):
         if j != excluding_voter:
-            response = best_response(voting_system, profile, j)
+            response = best_response(voting_system, profile, j, strategy)
             profile[j] = response
 
     return profile
 
-def best_response(voting_system, profile, voter_id):
+def best_response(voting_system, profile, voter_id, strategy: StrategicVote):
     """
     Compute best response ballot for a voter
     given current profile.
@@ -41,9 +41,11 @@ def best_response(voting_system, profile, voter_id):
     best_ballot = profile[voter_id]
     best_happiness = current_happiness
 
-    for perm in permutations(true_ballot):
+    strategies = strategy.find_all_strategies(voting_system, voter_id)
+
+    for strat in strategies:
         temp_profile = profile.copy()
-        temp_profile[voter_id] = perm
+        temp_profile[voter_id] = strat
 
         winner = voting_system.vote(temp_profile)[0][0]
         hap_model = BasicHappiness(winner, true_preferences)
@@ -53,7 +55,7 @@ def best_response(voting_system, profile, voter_id):
 
         if new_happiness > best_happiness:
             best_happiness = new_happiness
-            best_ballot = perm
+            best_ballot = strat
 
     return best_ballot
 
@@ -120,7 +122,7 @@ def atva2_sit(voting_system: VotingSystem, strategy: StrategicVote, voter_id: in
     true_ballot = true_preferences[voter_id]
     honest_profile = np.array(true_preferences.copy())
     honest_profile = apply_counter_responses(
-        voting_system, honest_profile, voter_id
+        voting_system, honest_profile, voter_id, strategy
     )
 
     honest_winner = voting_system.vote(honest_profile)[0][0]
@@ -142,7 +144,7 @@ def atva2_sit(voting_system: VotingSystem, strategy: StrategicVote, voter_id: in
 
         #apply counter responses symmetrically
         profile = apply_counter_responses(
-            voting_system, profile, voter_id
+            voting_system, profile, voter_id, strategy
         )
 
         final_winner = voting_system.vote(profile)[0][0]

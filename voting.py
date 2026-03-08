@@ -71,6 +71,7 @@ class VotingSystem:
 
         match self.scheme_name:
             case "plurality":
+                test = situation[:, 0]
                 unique, count = np.unique(situation[:, 0], return_counts=True)
                 winner = sorted(dict(zip(unique, count)).items(),
                                 key=lambda x: (x[1], ord('A') - ord(x[0])), reverse=True)

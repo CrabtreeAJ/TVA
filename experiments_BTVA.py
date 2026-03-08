@@ -17,7 +17,7 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
     
     risk_list = []
 
-    for num_candidates in range(2, 6):
+    for num_candidates in range(2, 11):
         for num_voters in range(2, 11):
             risk_list_iteration = []
             for iteration in range(iterations):
@@ -55,6 +55,19 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
                     elif strategy == "bullet":
                         new_situation = ATVA4_bullet_voting(VS)
                 
+                    winner = VS.vote(new_situation)[0][0]
+                    strategic_happiness_system = BasicHappiness(winner, true_preferences)
+                    strategic_happiness_metric = strategic_happiness_system.get_happiness()
+                    strategic_happiness_compiled = np.diag(strategic_happiness_metric)
+                
+                elif TVA == "ATVA1":
+                    if strategy == "compromise":
+                        new_situation = ATVA4_compromise(VS)
+                    elif strategy == "bury":
+                        new_situation = ATVA4_burying(VS)
+                    elif strategy == "bullet":
+                        new_situation = ATVA4_bullet_voting(VS)
+
                     winner = VS.vote(new_situation)[0][0]
                     strategic_happiness_system = BasicHappiness(winner, true_preferences)
                     strategic_happiness_metric = strategic_happiness_system.get_happiness()
@@ -192,4 +205,15 @@ if __name__ == "__main__":
     ATVA4 = "ATVA4"
 
     
-    main(borda, bury, ATVA2, 50)
+    main(borda, bullet, ATVA1, 50)
+    main(borda, compromise, ATVA1, 50)
+    main(borda, bury, ATVA1, 50)
+    main(anti_plurality, bullet, ATVA1, 50)
+    main(anti_plurality, compromise, ATVA1, 50)
+    main(anti_plurality, bury, ATVA1, 50)
+    main(voting_for_two, bullet, ATVA1, 50)
+    main(voting_for_two, compromise, ATVA1, 50)
+    main(voting_for_two, bury, ATVA1, 50)
+    main(plurality, bullet, ATVA1, 50)
+    main(plurality, compromise, ATVA1, 50)
+    main(plurality, bury, ATVA1, 50)
