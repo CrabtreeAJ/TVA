@@ -17,7 +17,7 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
     
     risk_list = []
 
-    for num_candidates in range(2, 11):
+    for num_candidates in range(2, 6):
         for num_voters in range(2, 11):
             risk_list_iteration = []
             for iteration in range(iterations):
@@ -192,4 +192,4 @@ if __name__ == "__main__":
     ATVA4 = "ATVA4"
 
     
-    main(borda, compromise, ATVA2, 50)
+    main(borda, bury, ATVA2, 50)
