@@ -216,8 +216,8 @@ def single_output(schema_type: str, strategy: str, TVA: str, num_candidates: int
                 strategic_happiness_system = BasicHappiness(winner, true_preferences)
                 strategic_happiness_metric = strategic_happiness_system.get_happiness()
                 print("-----Compromise voter ", y, "-----")
-                print(f"(strategic vote ={new_situation[y]}, new winner = {winner}, new happiness = {strategic_happiness_metric[y]}, old happiness = {happiness_metric[y]}, new overall happiness = {sum(strategic_happiness_metric)}, old overall happiness = {sum(happiness_metric)})")
-                print("---")
+                print(f"(strategic vote = {new_situation[y]}, new winner = {winner}, new happiness = {strategic_happiness_metric[y]}, old happiness = {happiness_metric[y]}, new overall happiness = {sum(strategic_happiness_metric)}, old overall happiness = {sum(happiness_metric)})")
+                print("\n")
 
             elif strategy == "bury":
                 if TVA == "BTVA":
@@ -230,7 +230,8 @@ def single_output(schema_type: str, strategy: str, TVA: str, num_candidates: int
                 strategic_happiness_system = BasicHappiness(winner, true_preferences)
                 strategic_happiness_metric = strategic_happiness_system.get_happiness()
                 print("-----Bury voter ", y, "-----")
-                print(f"(strategic vote ={new_situation[y]}, new winner = {winner}, new happiness = {strategic_happiness_metric[y]}, old happiness = {happiness_metric[y]}, new overall happiness = {sum(strategic_happiness_metric)}, old overall happiness = {sum(happiness_metric)})")
+                print(f"(strategic vote = {new_situation[y]}, new winner = {winner}, new happiness = {strategic_happiness_metric[y]}, old happiness = {happiness_metric[y]}, new overall happiness = {sum(strategic_happiness_metric)}, old overall happiness = {sum(happiness_metric)})")
+                print("\n")
 
 
             elif strategy == "bullet":
@@ -244,7 +245,8 @@ def single_output(schema_type: str, strategy: str, TVA: str, num_candidates: int
                 strategic_happiness_system = BasicHappiness(winner, true_preferences)
                 strategic_happiness_metric = strategic_happiness_system.get_happiness()
                 print("-----Bullet voter ", y, "-----")
-                print(f"(strategic vote ={ new_situation[y]}, new winner = {winner}, new happiness = {strategic_happiness_metric[y]}, old happiness = {happiness_metric[y]}, new overall happiness = {sum(strategic_happiness_metric)}, old overall happiness = {sum(happiness_metric)})")
+                print(f"(strategic vote = {new_situation[y]}, new winner = {winner}, new happiness = {strategic_happiness_metric[y]}, old happiness = {happiness_metric[y]}, new overall happiness = {sum(strategic_happiness_metric)}, old overall happiness = {sum(happiness_metric)})")
+                print("\n")
 
 
             winner = VS.vote(new_situation)[0][0]
@@ -349,7 +351,7 @@ if __name__ == "__main__":
     #main(plurality, bury, ATVA1, 50)
 
 
-    single_output(plurality, bury, BTVA, 3, 3)
+    single_output(plurality, compromise, ATVA3, 3, 3)
 
 
 
