@@ -20,6 +20,7 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
     for num_candidates in range(2, 11):
         for num_voters in range(2, 11):
             risk_list_iteration = []
+            happiness_list_iteration = []
             for iteration in range(iterations):
 
                 
@@ -59,6 +60,7 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
                     strategic_happiness_system = BasicHappiness(winner, true_preferences)
                     strategic_happiness_metric = strategic_happiness_system.get_happiness()
                     strategic_happiness_compiled = np.diag(strategic_happiness_metric)
+                    happiness_list_iteration.append(round(sum(strategic_happiness_metric)/len(strategic_happiness_metric),2))
                 
                 elif TVA == "ATVA1":
                     if strategy == "compromise":
@@ -72,6 +74,7 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
                     strategic_happiness_system = BasicHappiness(winner, true_preferences)
                     strategic_happiness_metric = strategic_happiness_system.get_happiness()
                     strategic_happiness_compiled = np.diag(strategic_happiness_metric)
+                    happiness_list_iteration.append(round(sum(strategic_happiness_metric)/len(strategic_happiness_metric),2))
 
                 else:
 
@@ -123,6 +126,7 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
                         strategic_happiness_system = BasicHappiness(winner, true_preferences)
                         strategic_happiness_metric = strategic_happiness_system.get_happiness()
                         strategic_happiness_compiled[y] = strategic_happiness_metric
+                        happiness_list_iteration.append(round(sum(strategic_happiness_metric)/len(strategic_happiness_metric),2))
 
                 #print("-----risk output-----")
 
@@ -130,12 +134,14 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
                 risk = b_risk.get_risk_from_happiness(happiness_metric, strategic_happiness_compiled)
                 #print(risk)
                 risk_list_iteration.append(round(risk,2))
+                
             
             risk_list.append({
                 "num_candidates": num_candidates,
                 "num_voters": num_voters,
                 "total_risk": round(sum(risk_list_iteration),2),
                 "avg_risk": round(sum(risk_list_iteration)/iterations,2),
+                "avg_happiness": round(sum(happiness_list_iteration)/len(happiness_list_iteration),2),
                 "n": iterations
             })            
             print(num_candidates, num_voters)
@@ -337,21 +343,21 @@ if __name__ == "__main__":
     ATVA4 = "ATVA4"
 
     
-    #main(borda, bullet, ATVA1, 50)
-    #main(borda, compromise, ATVA1, 50)
-    #main(borda, bury, ATVA1, 50)
-    #main(anti_plurality, bullet, ATVA1, 50)
-    #main(anti_plurality, compromise, ATVA1, 50)
-    #main(anti_plurality, bury, ATVA1, 50)
-    #main(voting_for_two, bullet, ATVA1, 50)
-    #main(voting_for_two, compromise, ATVA1, 50)
-    #main(voting_for_two, bury, ATVA1, 50)
-    #main(plurality, bullet, ATVA1, 50)
-    #main(plurality, compromise, ATVA1, 50)
-    #main(plurality, bury, ATVA1, 50)
+    main(borda, bullet, ATVA1, 50)
+    main(borda, compromise, ATVA1, 50)
+    main(borda, bury, ATVA1, 50)
+    main(anti_plurality, bullet, ATVA1, 50)
+    main(anti_plurality, compromise, ATVA1, 50)
+    main(anti_plurality, bury, ATVA1, 50)
+    main(voting_for_two, bullet, ATVA1, 50)
+    main(voting_for_two, compromise, ATVA1, 50)
+    main(voting_for_two, bury, ATVA1, 50)
+    main(plurality, bullet, ATVA1, 50)
+    main(plurality, compromise, ATVA1, 50)
+    main(plurality, bury, ATVA1, 50)
 
 
-    single_output(plurality, compromise, ATVA3, 3, 3)
+    #single_output(plurality, compromise, ATVA3, 3, 3)
 
 
 
