@@ -343,7 +343,7 @@ if __name__ == "__main__":
     ATVA4 = "ATVA4"
 
     
-    main(borda, bullet, ATVA1, 50)
+    main(borda, bullet, BTVA, 50)
     main(borda, compromise, ATVA1, 50)
     main(borda, bury, ATVA1, 50)
     main(anti_plurality, bullet, ATVA1, 50)
