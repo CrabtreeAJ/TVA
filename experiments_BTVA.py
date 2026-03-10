@@ -144,6 +144,136 @@ def main(schema_type: str, strategy: str, TVA: str, iterations: int):
     #print("risk_list", risk_list)    
 
 
+def single_output(schema_type: str, strategy: str, TVA: str, num_candidates: int, num_voters: int):
+
+    risk_list = []
+    risk_list_iteration = []
+
+    schema = generate_voting_schema(schema_type, num_candidates)
+
+    # Bug 1 fixed: build ALL preferences first, then create VS once
+    true_preferences = []
+    for y in range(num_voters):
+        voter_pref = list(string.ascii_lowercase[:num_candidates])
+        random.shuffle(voter_pref)
+        true_preferences.append(voter_pref)
+
+    VS = VotingSystem(np.array(true_preferences), list(string.ascii_lowercase[:num_candidates]), schema)
+
+    winners = VS.true_vote()
+    print(f"true prefs ={true_preferences}")
+    print(f"[candidates={num_candidates}, voters={num_voters}, true winner:", winners[0][0])
+    print("\n")
+
+    basic_happiness_system = BasicHappiness(winners[0][0], true_preferences)
+    happiness_metric = basic_happiness_system.get_happiness()
+
+    print("happiness for true voting:", happiness_metric)
+    print("total happiness for true voting", sum(happiness_metric))
+    print("\n")
+
+    strategic_happiness_compiled = [0] * len(happiness_metric)
+
+    if TVA == "ATVA4":
+        if strategy == "compromise":
+            new_situation = ATVA4_compromise(VS)
+        elif strategy == "bury":
+            new_situation = ATVA4_burying(VS)
+        elif strategy == "bullet":
+            new_situation = ATVA4_bullet_voting(VS)
+
+        winner = VS.vote(new_situation)[0][0]
+        strategic_happiness_system = BasicHappiness(winner, true_preferences)
+        strategic_happiness_metric = strategic_happiness_system.get_happiness()
+        strategic_happiness_compiled = np.diag(strategic_happiness_metric)
+
+    elif TVA == "ATVA1":
+        if strategy == "compromise":
+            new_situation = ATVA4_compromise(VS)
+        elif strategy == "bury":
+            new_situation = ATVA4_burying(VS)
+        elif strategy == "bullet":
+            new_situation = ATVA4_bullet_voting(VS)
+
+        winner = VS.vote(new_situation)[0][0]
+        strategic_happiness_system = BasicHappiness(winner, true_preferences)
+        strategic_happiness_metric = strategic_happiness_system.get_happiness()
+        strategic_happiness_compiled = np.diag(strategic_happiness_metric)
+
+    else:
+        for y in range(num_voters):
+
+            new_situation = ""
+
+            if strategy == "compromise":
+                if TVA == "BTVA":
+                    _, _, new_situation = CompromiseStrategy().find_strategy(VS, y)
+                elif TVA == "ATVA2":
+                    new_situation = atva2_sit(VS, CompromiseStrategy(), y)
+                elif TVA == "ATVA3":
+                    new_situation = ATVA3_imperfect_knowledge(VS, CompromiseStrategy(), y)
+                winner = VS.vote(new_situation)[0][0]
+                strategic_happiness_system = BasicHappiness(winner, true_preferences)
+                strategic_happiness_metric = strategic_happiness_system.get_happiness()
+                print("-----Compromise voter ", y, "-----")
+                print(f"(strategic vote ={new_situation[y]}, new winner = {winner}, new happiness = {strategic_happiness_metric[y]}, old happiness = {happiness_metric[y]}, new overall happiness = {sum(strategic_happiness_metric)}, old overall happiness = {sum(happiness_metric)})")
+                print("---")
+
+            elif strategy == "bury":
+                if TVA == "BTVA":
+                    _, _, new_situation = BuryingStrategy().find_strategy(VS, y)
+                elif TVA == "ATVA2":
+                    new_situation = atva2_sit(VS, BuryingStrategy(), y)
+                elif TVA == "ATVA3":
+                    new_situation = ATVA3_imperfect_knowledge(VS, BuryingStrategy(), y)
+                winner = VS.vote(new_situation)[0][0]
+                strategic_happiness_system = BasicHappiness(winner, true_preferences)
+                strategic_happiness_metric = strategic_happiness_system.get_happiness()
+                print("-----Bury voter ", y, "-----")
+                print(f"(strategic vote ={new_situation[y]}, new winner = {winner}, new happiness = {strategic_happiness_metric[y]}, old happiness = {happiness_metric[y]}, new overall happiness = {sum(strategic_happiness_metric)}, old overall happiness = {sum(happiness_metric)})")
+
+
+            elif strategy == "bullet":
+                if TVA == "BTVA":
+                    _, _, new_situation = BulletStrategy().find_strategy(VS, y)
+                elif TVA == "ATVA2":
+                    new_situation = atva2_sit(VS, BulletStrategy(), y)
+                elif TVA == "ATVA3":
+                    new_situation = ATVA3_imperfect_knowledge(VS, BulletStrategy(), y)
+                winner = VS.vote(new_situation)[0][0]
+                strategic_happiness_system = BasicHappiness(winner, true_preferences)
+                strategic_happiness_metric = strategic_happiness_system.get_happiness()
+                print("-----Bullet voter ", y, "-----")
+                print(f"(strategic vote ={ new_situation[y]}, new winner = {winner}, new happiness = {strategic_happiness_metric[y]}, old happiness = {happiness_metric[y]}, new overall happiness = {sum(strategic_happiness_metric)}, old overall happiness = {sum(happiness_metric)})")
+
+
+            winner = VS.vote(new_situation)[0][0]
+            strategic_happiness_system = BasicHappiness(winner, true_preferences)
+            strategic_happiness_metric = strategic_happiness_system.get_happiness()
+            strategic_happiness_compiled[y] = strategic_happiness_metric
+
+    print("\n")
+    print("-----risk output-----")
+
+    b_risk = BasicRisk(winner, true_preferences, schema)
+    risk = b_risk.get_risk_from_happiness(happiness_metric, strategic_happiness_compiled)
+    print(round(risk,1))
+    risk_list_iteration.append(round(risk, 2))
+
+    risk_list.append({
+        "num_candidates": num_candidates,
+        "num_voters": num_voters,
+        "total_risk": round(sum(risk_list_iteration), 2),
+        # Bug 2 fixed: divide by num_voters, not hardcoded 2
+        "avg_risk": round(sum(risk_list_iteration) / num_voters, 2),
+    })
+
+    #print(num_candidates, num_voters)
+
+    # save_results(risk_list, schema, strategy, f"{TVA}_{schema_type}_{strategy}")
+    # print("risk_list", risk_list)
+
+
 
 
 def save_results(risk_list: list, schema_type: str, strategy: str, filename: str = None):
@@ -205,15 +335,21 @@ if __name__ == "__main__":
     ATVA4 = "ATVA4"
 
     
-    main(borda, bullet, ATVA1, 50)
-    main(borda, compromise, ATVA1, 50)
-    main(borda, bury, ATVA1, 50)
-    main(anti_plurality, bullet, ATVA1, 50)
-    main(anti_plurality, compromise, ATVA1, 50)
-    main(anti_plurality, bury, ATVA1, 50)
-    main(voting_for_two, bullet, ATVA1, 50)
-    main(voting_for_two, compromise, ATVA1, 50)
-    main(voting_for_two, bury, ATVA1, 50)
-    main(plurality, bullet, ATVA1, 50)
-    main(plurality, compromise, ATVA1, 50)
-    main(plurality, bury, ATVA1, 50)
+    #main(borda, bullet, ATVA1, 50)
+    #main(borda, compromise, ATVA1, 50)
+    #main(borda, bury, ATVA1, 50)
+    #main(anti_plurality, bullet, ATVA1, 50)
+    #main(anti_plurality, compromise, ATVA1, 50)
+    #main(anti_plurality, bury, ATVA1, 50)
+    #main(voting_for_two, bullet, ATVA1, 50)
+    #main(voting_for_two, compromise, ATVA1, 50)
+    #main(voting_for_two, bury, ATVA1, 50)
+    #main(plurality, bullet, ATVA1, 50)
+    #main(plurality, compromise, ATVA1, 50)
+    #main(plurality, bury, ATVA1, 50)
+
+
+    single_output(plurality, bury, BTVA, 3, 3)
+
+
+
